@@ -8,13 +8,13 @@ export const walletAPI = {
   },
   
   // 充值
-  deposit(data) {
-    return api.post('/wallet/deposit', data)
+  deposit({ user_id, amount }) {
+    return api.post('/wallet/deposit', null, { params: { user_id, amount } })
   },
   
   // 提币
-  withdraw(data) {
-    return api.post('/wallet/withdraw', data)
+  withdraw({ user_id, amount }) {
+    return api.post('/wallet/withdraw', null, { params: { user_id, amount } })
   },
   
   // 获取交易记录
@@ -55,11 +55,11 @@ export const whitelistAPI = {
   
   // 添加到白名单
   addToWhitelist(userId) {
-    return api.post('/whitelist/add', { user_id: userId })
+    return api.post('/whitelist/add', null, { params: { user_id: userId } })
   },
   
   // 从白名单移除
   removeFromWhitelist(userId) {
-    return api.post('/whitelist/remove', { user_id: userId })
+    return api.post('/whitelist/remove', null, { params: { user_id: userId } })
   }
 }

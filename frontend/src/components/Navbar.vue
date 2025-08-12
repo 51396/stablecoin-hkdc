@@ -32,6 +32,10 @@
             <el-icon><UserFilled /></el-icon>
             <span>白名单</span>
           </el-menu-item>
+          <el-menu-item v-if="isIssuer" index="/issuer">
+            <el-icon><Coin /></el-icon>
+            <span>发行方控制台</span>
+          </el-menu-item>
           <el-sub-menu index="auth">
             <template #title>
               <el-icon><User /></el-icon>
@@ -48,9 +52,13 @@
 
 <script>
 import { Coin, Wallet, ShoppingCart, List, User, UserFilled } from '@element-plus/icons-vue'
+import { mapGetters } from 'vuex'
 export default {
   name: 'Navbar',
-  components: { Coin, Wallet, ShoppingCart, List, User, UserFilled }
+  components: { Coin, Wallet, ShoppingCart, List, User, UserFilled },
+  computed: {
+    ...mapGetters('issuer', ['isIssuer'])
+  }
 }
 </script>
 
