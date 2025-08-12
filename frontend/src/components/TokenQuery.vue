@@ -324,7 +324,10 @@ export default {
     
     formatTokenBalance(balance, decimals) {
       if (balance === null || balance === undefined) return '0'
-      return (balance / Math.pow(10, decimals)).toFixed(6)
+      const fractionDigits = Math.min(Number(decimals) || 6, 8)
+      const num = typeof balance === 'string' ? Number(balance) : balance
+      if (!Number.isFinite(num)) return '0'
+      return num.toFixed(fractionDigits)
     },
     
     getNetworkName(chainId) {

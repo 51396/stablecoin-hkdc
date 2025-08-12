@@ -335,8 +335,8 @@ export async function getTokenInfo(tokenAddress) {
     })
     
     // 解码字符串（简化处理）
-    const name = decodeHexString(nameResult)
-    const symbol = decodeHexString(symbolResult)
+    const name = decodeAbiString(nameResult)
+    const symbol = decodeAbiString(symbolResult)
     const decimals = parseInt(decimalsResult, 16)
     
     return {
@@ -351,13 +351,60 @@ export async function getTokenInfo(tokenAddress) {
   }
 }
 
-// 解码十六进制字符串
-function decodeHexString(hex) {
-  if (hex === '0x') return ''
+// 解码十六进制字符串（兼容 ABI 动态 string 与 bytes32）
+function decodeAbiString(hex) {
+  if (!hex || hex === '0x') return ''
   try {
-    return Buffer.from(hex.slice(2), 'hex').toString().replace(/\0/g, '')
-  } catch (error) {
-    return 'Unknown'
+    const cleanHex = hex.startsWith('0x') ? hex.slice(2) : hex
+    // bytes32（定长 32 字节 => 64 hex）
+    if (cleanHex.length === 64) {
+      const trimmed = trimRightZeros(cleanHex)
+      return hexToUtf8(trimmed)
+    }
+    // 兼容 ABI 动态字符串编码: [offset][length][data...]
+    // 单返回值时 offset 通常为 0x20（32 字节 => 64 hex）
+    const offsetHex = cleanHex.slice(0, 64)
+    let offset = parseInt(offsetHex, 16)
+    if (!Number.isFinite(offset) || offset === 0) {
+      // 退化处理：大多数实现为 0x20
+      offset = 32
+    }
+    const offsetIndex = offset * 2
+    const lengthHex = cleanHex.slice(offsetIndex, offsetIndex + 64)
+    const strLength = parseInt(lengthHex, 16)
+    const dataStart = offsetIndex + 64
+    const dataHex = cleanHex.slice(dataStart, dataStart + strLength * 2)
+    if (dataHex.length > 0) {
+      return hexToUtf8(dataHex)
+    }
+    // 回退到 bytes32 尝试
+    const fallback = trimRightZeros(cleanHex.slice(0, 64))
+    return hexToUtf8(fallback)
+  } catch (e) {
+    return ''
+  }
+}
+
+function trimRightZeros(hex) {
+  return hex.replace(/(00)+$/g, '')
+}
+
+function hexToUtf8(hex) {
+  if (!hex) return ''
+  // hex => Uint8Array
+  const bytes = new Uint8Array(hex.length / 2)
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] = parseInt(hex.substr(i * 2, 2), 16)
+  }
+  try {
+    const decoder = new TextDecoder('utf-8')
+    return decoder.decode(bytes).replace(/\0/g, '')
+  } catch (e) {
+    // 最后回退使用基本 ASCII 解码
+    return Array.from(bytes)
+      .map((b) => (b >= 32 && b <= 126 ? String.fromCharCode(b) : ''))
+      .join('')
+      .replace(/\0/g, '')
   }
 }
 
