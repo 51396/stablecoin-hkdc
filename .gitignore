@@ -1,0 +1,73 @@
+# ===== OS / 通用 =====
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ===== IDE / 编辑器 =====
+.vscode/
+.idea/
+*.iml
+
+# ===== 环境变量与密钥（保留示例） =====
+.env
+.env.*
+!.env.example
+
+# ===== 日志与覆盖率 =====
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+coverage/
+.coverage
+coverage.xml
+htmlcov/
+
+# ===== 前端（Node/Vue 等） =====
+node_modules/
+dist/
+build/
+.cache/
+.eslintcache
+.parcel-cache/
+.turbo/
+.npm/
+.pnp.*
+*.tsbuildinfo
+
+# 若你的前端在子目录（例如 frontend/），以下可选更明确（两者保留其一即可）
+# frontend/node_modules/
+# frontend/dist/
+# frontend/build/
+# frontend/.cache/
+# frontend/.eslintcache
+# frontend/.parcel-cache/
+# frontend/.turbo/
+# frontend/*.local
+
+# ===== 后端（Python/FastAPI） =====
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.so
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.python-version
+.venv/
+venv/
+env/
+pip-wheel-metadata/
+
+# ===== 本地数据库 / 运行态文件 =====
+*.db
+*.sqlite
+*.sqlite3
+
+.cursor/
