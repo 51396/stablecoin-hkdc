@@ -181,6 +181,10 @@ export default {
     console.log('Wallet component mounted')
     try {
       await this.checkConnection()
+      const defaultContract = process.env.VUE_APP_HKDC_ADDRESS || ''
+      if (defaultContract) {
+        await this.$store.dispatch('issuer/initIssuer', defaultContract)
+      }
     } catch (error) {
       console.error('Check connection error:', error)
     }
