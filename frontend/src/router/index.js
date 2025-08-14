@@ -11,6 +11,7 @@ import Dashboard from '../views/Dashboard.vue'
 const IssuerConsole = () => import('../views/IssuerConsole.vue')
 const AdminConsole = () => import('../views/Admin.vue')
 const ContractConfig = () => import('../views/ContractConfig.vue')
+const AddressManagement = () => import('../views/AddressManagement.vue')
 
 const routes = [
   { path: '/', component: Home },
@@ -24,6 +25,7 @@ const routes = [
   { path: '/issuer', component: IssuerConsole },
   { path: '/admin', component: AdminConsole },
   { path: '/contract-config', component: ContractConfig },
+  { path: '/address-management', component: AddressManagement },
 ]
 
 const router = createRouter({

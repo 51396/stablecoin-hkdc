@@ -40,6 +40,10 @@
               <el-icon><UserFilled /></el-icon>
               <span>白名单</span>
             </el-menu-item>
+            <el-menu-item index="/address-management">
+              <el-icon><List /></el-icon>
+              <span>地址管理</span>
+            </el-menu-item>
             <el-menu-item index="/contract-config">
               <el-icon><Setting /></el-icon>
               <span>合约配置</span>
