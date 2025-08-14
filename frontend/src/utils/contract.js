@@ -1,14 +1,11 @@
 export async function getProvider() {
-  if (typeof window === 'undefined' || !window.ethereum) {
-    throw new Error('未检测到 MetaMask')
-  }
-  const { ethers } = await import('ethers')
-  return new ethers.providers.Web3Provider(window.ethereum)
+  const { getProvider: getSingletonProvider } = await import('@/utils/provider')
+  return getSingletonProvider()
 }
 
 export async function getSigner() {
-  const provider = await getProvider()
-  return provider.getSigner()
+  const { getSigner: getSingletonSigner } = await import('@/utils/provider')
+  return getSingletonSigner()
 }
 
 export const HKDC_ABI = [
@@ -16,6 +13,7 @@ export const HKDC_ABI = [
   'function owner() view returns (address)',
   'function decimals() view returns (uint8)',
   'function balanceOf(address) view returns (uint256)',
+  'function totalSupply() view returns (uint256)',
   // Write (owner only)
   'function mint(address to, uint256 amount)',
   'function burn(address from, uint256 amount)',
@@ -37,8 +35,14 @@ export async function fetchOwnerAddress(contractAddress) {
 }
 
 export async function isOwner(contractAddress, currentAddress) {
+  console.log(1, currentAddress)
+
   if (!currentAddress) return false
   const owner = await fetchOwnerAddress(contractAddress)
+  console.log(2,owner.toLowerCase())
+  console.log(currentAddress.toLowerCase())
+  console.log(owner.toLowerCase() === currentAddress.toLowerCase())
+
   return owner.toLowerCase() === currentAddress.toLowerCase()
 }
 
@@ -74,4 +78,16 @@ export async function removeFromWhitelistOnChain(contractAddress, account) {
   const contract = await getHKDCContract(contractAddress)
   const tx = await contract.removeFromWhitelist(account)
   return tx.wait()
+}
+
+export async function isWhitelisted(contractAddress, account) {
+  const contract = await getHKDCContract(contractAddress)
+  return contract.isWhitelisted(account)
+}
+
+export async function getTotalSupply(contractAddress, decimals = 6) {
+  const contract = await getHKDCContract(contractAddress)
+  const totalSupply = await contract.totalSupply()
+  const { ethers } = await import('ethers')
+  return ethers.utils.formatUnits(totalSupply, decimals)
 }

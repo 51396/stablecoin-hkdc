@@ -24,10 +24,16 @@
       <div class="overview-card">
         <div class="overview-header">
           <h2>💰 钱包概览</h2>
+          <div class="header-buttons">
           <el-button type="primary" @click="refreshAll" :loading="isUpdating" size="small">
             <span class="btn-icon">🔄</span>
             刷新信息
           </el-button>
+          <el-button type="success" @click="checkConnection" size="small">
+            <span class="btn-icon">🔁</span>
+            切换账户
+          </el-button>
+        </div>
         </div>
         
         <div class="overview-grid">
@@ -189,6 +195,10 @@ export default {
       console.error('Check connection error:', error)
     }
   },
+  beforeUnmount() {
+    // 移除钱包事件监听器
+    this.$store.dispatch('wallet/removeEventListeners')
+  },
   methods: {
     ...mapActions('wallet', [
       'connectWallet',
@@ -226,6 +236,15 @@ export default {
       }
     },
     
+    async checkConnection() {
+      try {
+        await this.$store.dispatch('wallet/checkConnection')
+        ElMessage.success('账户信息已更新')
+      } catch (error) {
+        ElMessage.error('更新账户信息失败')
+      }
+    },
+    
     async copyAddress() {
       try {
         const address = this.$store.getters['wallet/walletAddress']
@@ -258,248 +277,258 @@ export default {
 }
 
 .page-header {
-  text-align: center;
-  margin-bottom: 30px;
-  color: white;
-}
+    text-align: center;
+    margin-bottom: 30px;
+    color: #303133;
+  }
 
-.page-header h1 {
-  font-size: 2.5rem;
-  margin: 0 0 10px 0;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
+  .page-header h1 {
+    font-size: 2.5rem;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
 
-.subtitle {
-  font-size: 1.1rem;
-  margin: 0;
-  opacity: 0.9;
-}
+  .subtitle {
+    font-size: 1.1rem;
+    margin: 0;
+    opacity: 0.8;
+    color: #606266;
+  }
 
-.connection-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  padding: 60px 40px;
-  text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-  backdrop-filter: blur(10px);
-}
+  .connection-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 60px 40px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
 
-.connection-content {
-  max-width: 400px;
-  margin: 0 auto;
-}
+  .connection-content {
+    max-width: 400px;
+    margin: 0 auto;
+  }
 
-.connection-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-}
+  .connection-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #303133;
+  }
 
-.connection-content h2 {
-  color: #303133;
-  margin: 0 0 15px 0;
-  font-size: 1.8rem;
-}
+  .connection-content h2 {
+    color: #303133;
+    margin: 0 0 15px 0;
+    font-size: 1.8rem;
+  }
 
-.connection-content p {
-  color: #606266;
-  margin: 0 0 30px 0;
-  font-size: 1.1rem;
-}
+  .connection-content p {
+    color: #606266;
+    margin: 0 0 30px 0;
+    font-size: 1.1rem;
+  }
 
-.wallet-content {
-  max-width: 1200px;
-  margin: 0 auto;
-}
+  .wallet-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 
-.overview-card, .status-card, .block-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-  backdrop-filter: blur(10px);
-}
+  .overview-card, .status-card, .block-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  }
 
-.overview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
+  .overview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
 
-.overview-header h2 {
-  margin: 0;
-  color: #303133;
-  font-size: 1.5rem;
-}
+  .overview-header h2 {
+    margin: 0;
+    color: #303133;
+    font-size: 1.5rem;
+  }
 
-.overview-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 25px;
-}
+  .header-buttons {
+    display: flex;
+    gap: 10px;
+  }
 
-.overview-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  padding: 25px;
-  border-radius: 15px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border: 1px solid #e9ecef;
-  transition: all 0.3s ease;
-}
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+  }
 
-.overview-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
+  .overview-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 25px;
+    border-radius: 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+  }
 
-.item-icon {
-  font-size: 2.5rem;
-  flex-shrink: 0;
-}
+  .overview-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
 
-.item-content h3 {
-  margin: 0 0 10px 0;
-  color: #303133;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
+  .item-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+    color: #303133;
+  }
 
-.address-text {
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 0.9rem;
-  background: #f8f9fa;
-  padding: 8px 12px;
-  border-radius: 8px;
-  margin: 10px 0;
-  word-break: break-all;
-  border: 1px solid #e9ecef;
-}
+  .item-content h3 {
+    margin: 0 0 10px 0;
+    color: #303133;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
 
-.network-info {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+  .address-text {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9rem;
+    background: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin: 10px 0;
+    word-break: break-all;
+    border: 1px solid #e9ecef;
+    color: #303133;
+  }
 
-.network-details {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  font-size: 0.85rem;
-  color: #606266;
-}
+  .network-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-.chain-id, .symbol {
-  background: #f8f9fa;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-family: monospace;
-}
+  .network-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.85rem;
+    color: #606266;
+  }
 
-.balance-amount {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #409eff;
-  margin: 10px 0 5px 0;
-}
+  .chain-id, .symbol {
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-family: monospace;
+    color: #303133;
+  }
 
-.balance-symbol {
-  font-size: 1rem;
-  color: #606266;
-  margin: 0;
-  font-weight: 500;
-}
+  .balance-amount {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #303133;
+    margin: 10px 0 5px 0;
+  }
 
-.status-card h3, .block-card h3 {
-  margin: 0 0 20px 0;
-  color: #303133;
-  font-size: 1.3rem;
-}
+  .balance-symbol {
+    font-size: 1rem;
+    color: #606266;
+    margin: 0;
+    font-weight: 500;
+  }
 
-.status-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-}
+  .status-card h3, .block-card h3 {
+    margin: 0 0 20px 0;
+    color: #303133;
+    font-size: 1.3rem;
+  }
 
-.status-item {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 20px;
-  border-radius: 12px;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-}
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
 
-.status-label {
-  font-weight: 600;
-  color: #606266;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+  .status-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 12px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+  }
 
-.status-value {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+  .status-label {
+    font-weight: 600;
+    color: #606266;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
-.value-text {
-  font-size: 1.1rem;
-  color: #303133;
-  font-weight: 500;
-  font-family: monospace;
-}
+  .status-value {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-.block-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-}
+  .value-text {
+    font-size: 1.1rem;
+    color: #303133;
+    font-weight: 500;
+    font-family: monospace;
+  }
 
-.block-item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 15px;
-  border-radius: 10px;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-}
+  .block-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
 
-.block-label {
-  font-size: 0.8rem;
-  color: #909399;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 600;
-}
+  .block-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+  }
 
-.block-value {
-  font-size: 1rem;
-  color: #303133;
-  font-weight: 500;
-  font-family: monospace;
-}
+  .block-label {
+    font-size: 0.8rem;
+    color: #909399;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
 
-.block-value.address {
-  font-size: 0.85rem;
-}
+  .block-value {
+    font-size: 1rem;
+    color: #303133;
+    font-weight: 500;
+    font-family: monospace;
+  }
 
-.actions-section {
-  text-align: center;
-  padding: 30px 0;
-}
+  .block-value.address {
+    font-size: 0.85rem;
+  }
 
-.btn-icon {
-  margin-right: 8px;
-}
+  .actions-section {
+    text-align: center;
+    padding: 30px 0;
+  }
+
+  .btn-icon {
+    margin-right: 8px;
+  }
 
 /* 响应式设计 */
 @media (max-width: 768px) {

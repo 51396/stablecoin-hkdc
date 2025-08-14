@@ -64,3 +64,43 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.page {
+  padding: 20px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #ebeef5;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.muted {
+  text-align: center;
+  color: #606266;
+  text-decoration: none;
+}
+
+.muted:hover {
+  color: #409eff;
+}
+</style>

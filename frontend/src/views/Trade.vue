@@ -101,7 +101,80 @@ export default {
 </script>
 
 <style scoped>
-.trade-tabs :deep(.el-tabs__header) { margin-bottom: 20px; }
-.market-info { display: grid; gap: 12px; }
-.w-100 { width: 100%; }
+.trade-container {
+  padding: 20px;
+}
+
+.page-title {
+  color: #303133;
+  margin-bottom: 20px;
+}
+
+.trade-section {
+  margin-bottom: 30px;
+}
+
+.trade-card {
+  background: #ffffff;
+  border: 1px solid #ebeef5;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+  margin-bottom: 20px;
+}
+
+.form-item {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  color: #606266;
+}
+
+.input {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #dcdfe6;
+  color: #303133;
+}
+
+.balance-info {
+  font-size: 0.9rem;
+  color: #606266;
+  margin-top: 5px;
+}
+
+.market-section {
+  margin-top: 30px;
+}
+
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.market-card {
+  background: #ffffff;
+  border: 1px solid #ebeef5;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.market-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+.market-label {
+  color: #606266;
+}
+
+.market-value {
+  color: #303133;
+  font-weight: 500;
+}
 </style>

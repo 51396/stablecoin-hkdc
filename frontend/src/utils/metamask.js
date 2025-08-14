@@ -238,6 +238,25 @@ export async function getTransactionReceipt(txHash) {
   }
 }
 
+// 监听交易状态变化
+export function onTransactionStatusChange(callback) {
+  if (!isMetaMaskInstalled()) {
+    return
+  }
+
+  // 监听交易状态变化事件
+  window.ethereum.on('transactionStatusChanged', callback)
+}
+
+// 移除交易状态变化监听器
+export function removeTransactionStatusListener() {
+  if (!isMetaMaskInstalled()) {
+    return
+  }
+
+  window.ethereum.removeAllListeners('transactionStatusChanged')
+}
+
 // 获取交易历史（最近的交易）
 export async function getTransactionHistory(address, limit = 10) {
   if (!isMetaMaskInstalled()) {
@@ -469,4 +488,6 @@ export function removeListeners() {
   }
 
   window.ethereum.removeAllListeners()
+  // 特别移除交易状态变化监听器
+  removeTransactionStatusListener()
 }

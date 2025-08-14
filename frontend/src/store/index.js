@@ -10,7 +10,16 @@ const store = createStore({
   mutations: {
     setUser(state, user) { state.user = user },
     setToken(state, token) { state.token = token },
-    logout(state) { state.user = null; state.token = null }
+    logout(state) { 
+      state.user = null; 
+      state.token = null;
+      // 清理Provider实例
+      import('@/utils/provider').then(({ clearProvider }) => {
+        clearProvider();
+      });
+      // 移除钱包事件监听器
+      this.dispatch('wallet/removeEventListeners');
+    }
   },
   actions: {},
   modules: {

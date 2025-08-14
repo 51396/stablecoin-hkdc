@@ -26,3 +26,11 @@
 
 1. 安装依赖：`npm install`
 2. 启动开发：`npm run serve`
+
+## 环境变量配置
+
+项目使用.env文件配置合约地址等环境变量：
+
+- `VUE_APP_CONTRACT_ADDRESS`：稳定币合约地址
+
+请确保在运行项目前正确配置这些环境变量。

@@ -1,11 +1,11 @@
-/* 全局现代风格，深色主题 */
+/* 全局现代风格，浅色主题 */
 :root {
-  --bg: #0b1220;
-  --panel: #0f1a31;
-  --panel-2: #111f3a;
-  --text: #c9d4f1;
-  --muted: #91a0c0;
-  --brand: #e6a23c;
+  --bg: #f5f7fa;
+  --panel: #ffffff;
+  --panel-2: #f0f2f5;
+  --text: #303133;
+  --muted: #909399;
+  --brand: #409eff;
   --success: #67c23a;
   --danger: #f56c6c;
 }
@@ -18,17 +18,17 @@
 }
 
 .card {
-  background: linear-gradient(180deg, var(--panel), var(--panel-2));
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
   padding: 20px;
   color: var(--text);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 .card-title {
   display: flex; align-items: center; gap: 10px;
-  color: #e8eefc; font-weight: 600; margin-bottom: 12px;
+  color: var(--text); font-weight: 600; margin-bottom: 12px;
 }
 
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
@@ -36,22 +36,22 @@
 
 .muted { color: var(--muted); }
 
-.section-title { color: #e8eefc; font-size: 18px; font-weight: 600; margin: 8px 0 12px; }
+.section-title { color: var(--text); font-size: 18px; font-weight: 600; margin: 8px 0 12px; }
 
 .toolbar { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
 
 .stat {
   padding: 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  border: 1px solid #ebeef5;
+  background: var(--panel-2);
   color: var(--text);
 }
 
-.stat .value { font-size: 22px; font-weight: 700; color: #e8eefc; }
+.stat .value { font-size: 22px; font-weight: 700; color: var(--text); }
 .stat .label { font-size: 12px; color: var(--muted); }
 
-.el-input__wrapper, .el-select__wrapper { background: rgba(255,255,255,0.04) !important; }
+.el-input__wrapper, .el-select__wrapper { background: var(--panel) !important; }
 .el-button--primary { background: var(--brand) !important; border-color: var(--brand) !important; }
 .w-100 { width: 100%; }
 

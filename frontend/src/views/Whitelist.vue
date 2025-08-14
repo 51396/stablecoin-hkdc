@@ -82,6 +82,57 @@ export default {
 </script>
 
 <style scoped>
-.whitelist-table :deep(.el-table) { background: transparent; }
-.whitelist-table :deep(.el-table th) { background: rgba(255,255,255,0.02); }
+.page-title {
+  color: #303133;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #ebeef5;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: end;
+}
+
+.form-item {
+  flex: 1;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  color: #606266;
+}
+
+.input {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #dcdfe6;
+  color: #303133;
+}
+
+.whitelist-table :deep(.el-table) {
+  background: #ffffff;
+  border: 1px solid #ebeef5;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.whitelist-table :deep(.el-table__header) {
+  background: #f5f7fa;
+}
+
+.whitelist-table :deep(.el-table__row) {
+  background: transparent;
+}
+
+.whitelist-table :deep(.el-table__cell) {
+  color: #303133;
+  border-color: #ebeef5;
+}
 </style>

@@ -1,8 +1,8 @@
 import { 
   connectMetaMask, 
   getCurrentAccount, 
-  getAccountBalance, 
   getNetworkInfo,
+  getAccountBalance,
   getGasPrice,
   getBlockNumber,
   getBlockInfo,
@@ -13,6 +13,7 @@ import {
   onChainChanged,
   removeListeners
 } from '@/utils/metamask'
+import { walletAPI } from '@/api/wallet'
 
 const state = {
   connected: false,
@@ -122,6 +123,10 @@ const actions = {
   async disconnectWallet({ commit, dispatch }) {
     commit('CLEAR_WALLET')
     dispatch('removeEventListeners')
+    
+    // 清理Provider实例
+    const { clearProvider } = await import('@/utils/provider')
+    clearProvider()
   },
   
   async checkConnection({ commit, dispatch }) {
@@ -153,9 +158,14 @@ const actions = {
       }
       
       // 获取余额
-      const balance = await getAccountBalance(state.address)
-      if (balance !== null) {
-        commit('SET_BALANCE', balance)
+      try {
+        const balance = await getAccountBalance(state.address);
+        if (balance !== null) {
+          commit('SET_BALANCE', balance);
+        }
+      } catch (error) {
+        console.error('获取余额失败:', error);
+        commit('SET_ERROR', error.message);
       }
     } catch (error) {
       console.error('更新钱包信息失败:', error)
