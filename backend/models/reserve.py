@@ -28,6 +28,32 @@ class AssetTransactionDB(Base):
     
     asset = relationship("ReserveAssetDB", back_populates="transactions")
 
+class ProofOfReserveReportDB(Base):
+    __tablename__ = "proof_of_reserve_reports"
+
+    id = Column(Integer, primary_key=True, index=True)
+    report_date = Column(DateTime, nullable=False, index=True)
+    total_reserve_usd = Column(Float, nullable=False)
+    total_supply = Column(Float, nullable=False) # 链上总供应量
+    collateral_ratio = Column(Float, nullable=False)
+    
+    # 证明来源，例如 "Chainlink PoR" 或审计公司名称
+    attestation_firm = Column(String, default="Internal Audit") 
+    
+    # 指向详细报告文件(PDF/JSON)的链接，这里我们存个模拟路径
+    report_url = Column(String, nullable=True) 
+    
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class DailyMetricDB(Base):
+    __tablename__ = "daily_metrics"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(DateTime, nullable=False, unique=True, index=True)
+    market_cap = Column(Float)
+    circulating_supply = Column(Float)
+    daily_volume = Column(Float)
+    active_addresses = Column(Integer)
 
 from sqlalchemy.orm import Session
 from ..schemas.reserve import ReserveAssetCreate, AssetTransactionCreate,ReserveAssetUpdate

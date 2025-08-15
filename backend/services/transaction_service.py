@@ -505,12 +505,23 @@ HKDC_ABI = [
 ]
 
 
-def get_transaction_history(db: Session, user_id: int = None, limit: int = 100):
+def get_transaction_history(db: Session, user_id: int = None, limit: int = 100, return_query: bool = False):
     """获取交易历史记录"""
     query = db.query(Transaction)
     if user_id:
         query = query.filter(Transaction.user_id == user_id)
-    return query.order_by(Transaction.timestamp.desc()).limit(limit).all()
+    
+    query = query.order_by(Transaction.timestamp.desc())
+    
+    if return_query:
+        # 返回查询对象，用于分页
+        return query
+    elif limit > 0:
+        # 限制返回数量
+        return query.limit(limit).all()
+    else:
+        # 返回所有结果
+        return query.all()
 
 
 def get_transaction_by_id(db: Session, tx_id: int):

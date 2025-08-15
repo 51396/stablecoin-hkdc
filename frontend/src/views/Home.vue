@@ -20,10 +20,22 @@
             <h3>资产管理</h3>
             <p>全面的资产视图和管理工具</p>
           </div>
+          <div class="feature-card">
+            <el-icon class="feature-icon"><Money /></el-icon>
+            <h3>储备金管理</h3>
+            <p>查看和管理稳定币的储备金资产</p>
+            <el-button type="primary" @click="$router.push('/reserve-management')">访问储备金</el-button>
+          </div>
+          <div class="feature-card">
+            <el-icon class="feature-icon"><Document /></el-icon>
+            <h3>储备金证明</h3>
+            <p>查看稳定币的储备金审计报告和证明</p>
+            <el-button type="primary" @click="$router.push('/proof-of-reserve')">查看证明</el-button>
+          </div>
         </div>
       </div>
     </div>
-    <div class="login-sidebar">
+    <!-- <div class="login-sidebar">
       <el-card class="login-card">
         <div class="card-title">
           <el-icon><User /></el-icon>
@@ -50,12 +62,12 @@
           </div>
         </el-form>
       </el-card>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
-import { User, Lock, Shield, RefreshRight, PieChart } from '@element-plus/icons-vue'
+import { User, Lock, Shield, RefreshRight, PieChart, Document, Money } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -64,7 +76,7 @@ import { ElMessage } from 'element-plus'
 
 export default {
   name: 'Home',
-  components: { User, Lock, Shield, RefreshRight, PieChart },
+  components: { User, Lock, Shield, RefreshRight, PieChart, Document, Money },
   setup() {
     const router = useRouter()
     const store = useStore()

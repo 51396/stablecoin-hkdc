@@ -85,7 +85,7 @@ def get_reserve_data_endpoint(db: Session = Depends(get_db)):
         response_data = ReserveData(
             totalReserve=total_reserve_usd,
             circulatingSupply=circulating_supply,
-            collateralRatio=total_reserve_usd / circulating_supply,
+            collateralRatio=total_reserve_usd / circulating_supply * 100,
             assetTypes=len(set(asset.asset_type for asset in db_assets)),
             lastUpdated=datetime.utcnow(),
             assets=final_assets
@@ -171,3 +171,42 @@ def update_asset_endpoint(
         raise HTTPException(status_code=404, detail="资产未找到")
         
     return updated_asset
+
+
+from ..models.reserve import ProofOfReserveReportDB
+from ..schemas.reserve import ProofOfReserveReportSchema
+from sqlalchemy import desc
+
+@router.get("/proof-of-reserve",
+            response_model=List[ProofOfReserveReportSchema],
+            summary="获取历史储备金证明报告")
+def get_proof_of_reserve_reports_endpoint(db: Session = Depends(get_db)):
+    """
+    为公开的透明度页面提供数据。
+    返回按日期降序排列的所有已生成的审计报告摘要。
+    """
+    reports = db.query(ProofOfReserveReportDB).order_by(desc(ProofOfReserveReportDB.report_date)).all()
+    return reports
+
+from ..schemas.reserve import CoreMetricsData # 导入新 Schema
+from ..services import core_metrics # 导入新服务模块
+
+@router.get("/metrics",
+            response_model=CoreMetricsData,
+            summary="获取核心指标仪表盘的全部数据")
+def get_core_metrics_endpoint():
+    """
+    为核心指标仪表盘提供一站式实时和历史数据。
+    """
+    current = core_metrics.get_current_metrics()
+    
+    return CoreMetricsData(
+        marketCap=current['marketCap'],
+        circulatingSupply=current['circulatingSupply'],
+        volume24h=current['volume24h'],
+        activeAddresses24h=current['activeAddresses24h'],
+        lastUpdated=datetime.utcnow(),
+        marketCapHistory30d=core_metrics.get_market_cap_history(),
+        volumeDistribution=core_metrics.get_volume_distribution(),
+        realTimeTransactions=core_metrics.get_real_time_transactions()
+    )

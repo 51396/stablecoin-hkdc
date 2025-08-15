@@ -263,8 +263,20 @@ export default {
         // // 先调用后端接口手动刷新交易历史数据（从链上获取）
         // await tradeAPI.refreshTradeHistory()
         // 再获取最新的交易历史数据（从数据库）
-        const response = await tradeAPI.getTradeHistory()
-        this.transactions = response.data || []
+        const response = await tradeAPI.getTradeHistory({
+          page: this.currentPage,
+          per_page: this.pageSize
+        })
+        
+        // 处理分页数据
+        if (response.data && response.data.items) {
+          this.transactions = response.data.items
+          this.total = response.data.total
+        } else {
+          this.transactions = response.data || []
+          this.total = this.transactions.length
+        }
+        
         ElMessage.success('数据已刷新')
       } catch (error) {
         ElMessage.error('刷新数据失败')
@@ -277,9 +289,11 @@ export default {
     handleSizeChange(val) {
       this.pageSize = val
       this.currentPage = 1
+      this.refreshData()
     },
     handleCurrentChange(val) {
       this.currentPage = val
+      this.refreshData()
     },
     // 启动定时刷新
     startAutoRefresh() {

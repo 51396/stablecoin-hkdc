@@ -71,11 +71,48 @@ class ReserveAssetUpdate(BaseModel):
     # base_balance 的更新通过 adjust_asset_balance 接口处理，这里不包含
 
 
+class ProofOfReserveReportSchema(BaseModel):
+    id: int
+    report_date: datetime
+    total_reserve_usd: float
+    total_supply: float
+    collateral_ratio: float
+    attestation_firm: str
+    report_url: Optional[str]
+
+    class Config:
+        from_attributes = True
 
 
 
+class MetricHistoryPoint(BaseModel):
+    """历史数据图表的单个数据点"""
+    timestamp: datetime
+    value: float
 
+class VolumeDistributionPoint(BaseModel):
+    """交易量分布的单个数据点"""
+    source: str # 例如 'Uniswap', 'Coinbase', 'Binance'
+    volume: float
 
+class RealTimeTransaction(BaseModel):
+    """实时交易Feed的单条记录"""
+    hash: str
+    from_addr: str
+    to_addr: str
+    amount: float
+    timestamp: datetime
+
+class CoreMetricsData(BaseModel):
+    """核心指标仪表盘API的顶级响应模型"""
+    marketCap: float
+    circulatingSupply: float
+    volume24h: float
+    activeAddresses24h: int
+    lastUpdated: datetime
+    marketCapHistory30d: list[MetricHistoryPoint]
+    volumeDistribution: list[VolumeDistributionPoint]
+    realTimeTransactions: list[RealTimeTransaction]
 
 
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
 from ..database import SessionLocal, get_db
 from ..models import Transaction, User
@@ -8,12 +8,25 @@ from ..services.transaction_service import get_transaction_history, monitor_onch
 router = APIRouter(prefix="/transactions", tags=["交易管理"])
 
 @router.get("/history", summary="交易历史记录")
-def get_transaction_history_endpoint(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_transaction_history_endpoint(
+    page: int = Query(1, ge=1, description="页码"),
+    per_page: int = Query(10, ge=1, le=100, description="每页数量"),
+    current_user: User = Depends(get_current_user), 
+    db: Session = Depends(get_db)
+):
+    # 计算偏移量
+    offset = (page - 1) * per_page
+    
     # 如果是管理员，返回所有交易记录，包括合约交易
     if current_user.role == "admin":
-        transactions = db.query(Transaction).order_by(Transaction.timestamp.desc()).all()
+        transactions_query = db.query(Transaction).order_by(Transaction.timestamp.desc())
+        total = transactions_query.count()
+        transactions = transactions_query.offset(offset).limit(per_page).all()
     else:
-        transactions = get_transaction_history(db, current_user.id)
+        # 对于普通用户，需要修改get_transaction_history以支持分页
+        transactions_query = get_transaction_history(db, current_user.id, return_query=True)
+        total = transactions_query.count()
+        transactions = transactions_query.offset(offset).limit(per_page).all()
     
     # 将交易记录转换为字典列表，确保包含所有字段
     transaction_list = []
@@ -35,7 +48,13 @@ def get_transaction_history_endpoint(current_user: User = Depends(get_current_us
         }
         transaction_list.append(transaction_dict)
     
-    return transaction_list
+    # 返回分页结果
+    return {
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "items": transaction_list
+    }
 
 @router.get("/monitor", summary="交易监控")
 def get_pending_transactions(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):

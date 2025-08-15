@@ -25,6 +25,10 @@ export const reserveAPI = {
   // 更新资产
   updateAsset(assetId, assetData) {
     return api.put(`/reserves/manage/assets/${assetId}`, assetData)
+  },
+  // 获取核心指标
+  getCoreMetrics() {
+    return api.get('/reserves/metrics')
   }
 }
 

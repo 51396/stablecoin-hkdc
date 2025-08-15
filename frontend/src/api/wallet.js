@@ -46,8 +46,8 @@ export const tradeAPI = {
   },
   
   // 获取交易历史（从数据库）
-  getTradeHistory() {
-    return request.get('/transactions/history')
+  getTradeHistory(params) {
+    return request.get('/transactions/history', { params })
   },
   
   // 检查交易状态

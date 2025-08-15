@@ -14,6 +14,7 @@ const ContractConfig = () => import('../views/ContractConfig.vue')
 const AddressManagement = () => import('../views/AddressManagement.vue')
 const ReserveManagement = () => import('../views/ReserveManagement.vue')
 const ReserveAdmin = () => import('../views/ReserveAdmin.vue')
+const ProofOfReserve = () => import('../views/ProofOfReserve.vue')
 
 const routes = [
   { path: '/', component: Home },
@@ -30,6 +31,7 @@ const routes = [
   { path: '/address-management', component: AddressManagement },
   { path: '/reserve-management', component: ReserveManagement },
   { path: '/reserve-admin', component: ReserveAdmin },
+  { path: '/proof-of-reserve', component: ProofOfReserve },
 ]
 
 const router = createRouter({
