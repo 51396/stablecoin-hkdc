@@ -6,7 +6,16 @@
 
 - backend/
   - core/         # 核心功能（如安全、配置）
-  - models.py     # ORM模型
+  - models/       # ORM模型目录
+    - __init__.py # 模型导入
+    - base.py     # 基础模型
+    - user.py     # 用户模型
+    - wallet.py   # 钱包模型
+    - transaction.py # 交易模型
+    - address.py  # 地址模型
+    - whitelist.py # 白名单模型
+    - total_supply.py # 总供应量模型
+    - reserve.py  # 储备金模型
   - schemas.py    # Pydantic数据模型
   - services/     # 业务逻辑层
   - routers/      # 路由层

@@ -102,13 +102,17 @@
         <!-- 白名单 列 -->
         <el-table-column label="白名单" width="100">
           <template #default="{row}">
-            <el-switch v-if="row" :value="row.is_whitelisted" disabled active-color="#13ce66"></el-switch>
+            {{ logRow(Boolean(row.is_whitelisted)) }}
+            {{ logRow(row.is_whitelisted) }}
+            {{ logRow(row.is_whitelisted === 'true') }}
+            {{ logRow(row.is_whitelisted == 'true') }}
+            <el-switch v-if="row" :value="Boolean(row.is_whitelisted === 'true')" disabled active-color="#13ce66"></el-switch>
           </template>
         </el-table-column>
         <!-- 黑名单 列 -->
         <el-table-column label="黑名单" width="100">
           <template #default="{row}">
-            <el-switch v-if="row" :value="row.is_blacklisted" disabled active-color="#ff4949"></el-switch>
+            <el-switch v-if="row" :value="Boolean(row.is_blacklisted)" disabled active-color="#ff4949"></el-switch>
           </template>
         </el-table-column>
         <!-- 创建时间 列 -->
@@ -121,8 +125,8 @@
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{row}">
             <div v-if="row">
-              <el-button size="mini" @click="editAddress(row)" icon="el-icon-edit">编辑</el-button>
-              <el-button size="mini" type="danger" @click="deleteAddress(row.id)" icon="el-icon-delete">删除</el-button>
+              <el-button size="small" @click="editAddress(row)" icon="el-icon-edit">编辑</el-button>
+              <el-button size="small" type="danger" @click="deleteAddress(row.id)" icon="el-icon-delete">删除</el-button>
             </div>
           </template>
         </el-table-column>

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from .database import init_db, get_db
-from .routers import user, wallet, trade, whitelist, mint, burn, transaction, contract, dashboard, issuer, total_supply, address
+from .routers import user, wallet, trade, whitelist, mint, burn, transaction, contract, dashboard, issuer, total_supply, address, reserve
 from .services.transaction_service import sync_contract_transactions
 from .services.total_supply_service import update_total_supply_periodically
 import asyncio
@@ -31,6 +31,7 @@ app.include_router(dashboard.dashboard_router)
 app.include_router(issuer.router)
 app.include_router(total_supply.router)
 app.include_router(address.router)
+app.include_router(reserve.router)
 
 # 存储后台任务的引用
 background_task = None
@@ -46,10 +47,10 @@ async def sync_transactions_periodically():
             count = sync_contract_transactions(db)
             print(f"同步了 {count} 笔合约交易")
             # 每30秒同步一次
-            await asyncio.sleep(30)
+            await asyncio.sleep(30000000)
         except Exception as e:
             print(f"同步合约交易时出错: {e}")
-            await asyncio.sleep(30)
+            await asyncio.sleep(300000000)
 
 async def update_total_supply_periodically_task():
     """定期更新总供应量"""
@@ -59,10 +60,10 @@ async def update_total_supply_periodically_task():
             update_total_supply_periodically()
             print("总供应量已更新")
             # 每60秒更新一次
-            await asyncio.sleep(60)
+            await asyncio.sleep(600000000)
         except Exception as e:
             print(f"更新总供应量时出错: {e}")
-            await asyncio.sleep(60)
+            await asyncio.sleep(600000000)
 
 def start_background_sync():
     """启动后台同步任务"""

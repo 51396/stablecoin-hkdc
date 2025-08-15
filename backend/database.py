@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .models import Base, User
+from .models.base import Base
+from .models.user import User
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./stablecoin.db"
 

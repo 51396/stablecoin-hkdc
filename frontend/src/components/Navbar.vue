@@ -48,6 +48,10 @@
               <el-icon><Setting /></el-icon>
               <span>合约配置</span>
             </el-menu-item>
+            <el-menu-item index="/reserve-management">
+              <el-icon><Coin /></el-icon>
+              <span>储备金管理</span>
+            </el-menu-item>
             <el-menu-item index="/transactions">
               <el-icon><List /></el-icon>
               <span>交易记录</span>

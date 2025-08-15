@@ -12,6 +12,8 @@ const IssuerConsole = () => import('../views/IssuerConsole.vue')
 const AdminConsole = () => import('../views/Admin.vue')
 const ContractConfig = () => import('../views/ContractConfig.vue')
 const AddressManagement = () => import('../views/AddressManagement.vue')
+const ReserveManagement = () => import('../views/ReserveManagement.vue')
+const ReserveAdmin = () => import('../views/ReserveAdmin.vue')
 
 const routes = [
   { path: '/', component: Home },
@@ -26,6 +28,8 @@ const routes = [
   { path: '/admin', component: AdminConsole },
   { path: '/contract-config', component: ContractConfig },
   { path: '/address-management', component: AddressManagement },
+  { path: '/reserve-management', component: ReserveManagement },
+  { path: '/reserve-admin', component: ReserveAdmin },
 ]
 
 const router = createRouter({
