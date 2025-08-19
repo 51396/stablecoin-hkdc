@@ -25,16 +25,12 @@
             <el-form-item label="API Ticker" prop="ticker">
               <el-input v-model="newAssetForm.ticker" placeholder="例如: XAUUSD, BTCUSDT"></el-input>
             </el-form-item>
-             <el-form-item label="初始数量" prop="base_balance">
-              <el-input-number v-model="newAssetForm.base_balance" :min="0" controls-position="right" style="width: 100%;"></el-input-number>
-            </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="handleCreateAsset" :loading="formLoading">确认录入</el-button>
             </el-form-item>
           </el-form>
         </el-card>
       </el-col>
-
       <!-- 右侧：已录入资产列表 -->
       <el-col :span="16">
         <el-card class="box-card">
@@ -55,7 +51,6 @@
             <el-table-column label="操作" width="150" align="center">
               <template #default="{ row }">
                 <el-button size="mini" @click="openEditDialog(row)" icon="el-icon-edit">修改</el-button>
-                <el-button size="mini" type="primary" @click="openTransactionDialog(row)">调整数量</el-button>
                 <!-- <el-button size="mini" type="danger" @click="handleDeleteAsset(row)">删除</el-button> -->
               </template>
             </el-table-column>
@@ -64,28 +59,6 @@
       </el-col>
     </el-row>
     
-    <!-- 数量调整对话框 -->
-    <el-dialog title="调整资产数量" v-model="dialogVisible" width="500px">
-        <p>正在为 <strong>{{ currentAsset.name }}</strong> 调整数量</p>
-        <el-form :model="transactionForm" :rules="transactionRules" ref="transactionFormRef" label-position="top">
-            <el-form-item label="操作类型" prop="transaction_type">
-                <el-radio-group v-model="transactionForm.transaction_type">
-                    <el-radio label="存入">存入 (增加数量)</el-radio>
-                    <el-radio label="取出">取出 (减少数量)</el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item label="变动数量" prop="amount">
-                <el-input-number v-model="transactionForm.amount" :min="0.01" controls-position="right" style="width: 100%;"></el-input-number>
-            </el-form-item>
-            <el-form-item label="备注/原因" prop="notes">
-                <el-input type="textarea" v-model="transactionForm.notes" placeholder="例如：新购入, 市场卖出"></el-input>
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <el-button @click="dialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="handleAdjustBalance" :loading="dialogLoading">确认调整</el-button>
-        </template>
-    </el-dialog>
       <el-dialog title="修改资产信息" v-model="editDialogVisible" width="500px">
     <el-form :model="editAssetForm" :rules="editFormRules" ref="editAssetFormRef" label-position="top">
       <el-form-item label="资产名称" prop="name">

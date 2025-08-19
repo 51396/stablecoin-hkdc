@@ -29,6 +29,12 @@ export const reserveAPI = {
   // 获取核心指标
   getCoreMetrics() {
     return api.get('/reserves/metrics')
+  },
+  createAssetAccount(data){
+    return api.post("/reserves/account",data)
+  },
+  getAssetAccounts(data){
+    return api.get("/reserves/accounts",data)
   }
 }
 

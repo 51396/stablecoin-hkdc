@@ -1,127 +1,134 @@
 <template>
-  <div class="dashboard-container">
+  <!-- 1. 根容器，应用深色背景和全宽布局 -->
+  <div class="light-tech-dashboard">
     
-    <!-- 1. 欢迎和问候区 -->
-    <el-card class="box-card welcome-card">
-      <div class="welcome-content">
-        <el-avatar :size="60" icon="el-icon-user-solid" class="welcome-avatar"></el-avatar>
-        <div class="welcome-text">
-          <h2 class="welcome-title">欢迎回来，{{ userInfo.username || '用户' }}！</h2>
-          <p class="welcome-subtitle">
-            您的角色：
-            <el-tag size="small">{{ userInfo.role === 'admin' ? '管理员' : userInfo.role === 'issuer' ? '发行方' : '普通用户' }}</el-tag>
-          </p>
-        </div>
+    <!-- 2. 页面头部 -->
+    <div class="page-header">
+      <div class="header-left">
+        <h1 class="page-title">数据驾驶舱</h1>
+        <p class="page-subtitle">稳定币生态系统实时监控</p>
       </div>
-    </el-card>
+    </div>
 
-    <!-- 2. 核心指标 KPI 卡片区 (复用之前的设计) -->
-    <el-row :gutter="24" class="kpi-row">
-      <el-col :span="6">
-        <div class="kpi-card">
-          <p class="kpi-label">市值 (Market Cap)</p>
-          <animated-number class="kpi-value" :value="metricsData.marketCap" :fraction-digits="2" format="${value}" />
-        </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="kpi-card">
-          <p class="kpi-label">流通量 (Circulating Supply)</p>
-          <animated-number class="kpi-value" :value="metricsData.circulatingSupply" :fraction-digits="2" />
-        </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="kpi-card">
-          <p class="kpi-label">24小时交易量</p>
-          <animated-number class="kpi-value" :value="metricsData.volume24h" :fraction-digits="2" format="${value}" />
-        </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="kpi-card">
-          <p class="kpi-label">24小时活跃地址</p>
-          <animated-number class="kpi-value" :value="metricsData.activeAddresses24h" />
-        </div>
-      </el-col>
-    </el-row>
-
-    <!-- 3. 主图表区 -->
+    <!-- 3. 顶部KPI卡片区 - 使用el-row -->
     <el-row :gutter="24">
-      <el-col :span="16">
-        <el-card class="box-card chart-card">
-          <template #header>
-            <div class="card-header">市值历史趋势 (30天)</div>
-          </template>
-          <div ref="historyChartRef" class="chart-container"></div>
-        </el-card>
-      </el-col>
-      <el-col :span="8">
-        <el-card class="box-card chart-card">
-          <template #header>
-            <div class="card-header">24小时交易量分布</div>
-          </template>
-          <div ref="barChartRef" class="chart-container"></div>
-        </el-card>
-      </el-col>
-    </el-row>
-    
-    <!-- 4. 列表区：实时交易 和 最近交易 -->
-    <el-row :gutter="24">
-      <!-- 左侧：实时大额交易 -->
-      <el-col :span="12">
-        <el-card class="box-card list-card">
-          <template #header>
-            <div class="card-header">实时大额交易</div>
-          </template>
-          <div class="transaction-feed">
-            <transition-group name="list" tag="ul">
-              <li v-for="tx in metricsData.realTimeTransactions" :key="tx.hash" class="tx-item">
-                <span class="tx-time">{{ formatTimeAgo(tx.timestamp) }}</span>
-                <span class="tx-info">
-                  From <span class="tx-address">{{ truncateAddress(tx.from_addr) }}</span>
-                  To <span class="tx-address">{{ truncateAddress(tx.to_addr) }}</span>
-                </span>
-                <span class="tx-amount">{{ formatCurrency(tx.amount) }}</span>
-              </li>
-            </transition-group>
-             <el-empty v-if="!metricsData.realTimeTransactions || metricsData.realTimeTransactions.length === 0" description="暂无大额交易"></el-empty>
+      <el-col :xs="24" :sm="12" :lg="6">
+        <div class="kpi-card">
+          <div class="kpi-icon-wrapper" style="--icon-bg: #e6f7ff; --icon-color: #1890ff;">
+            <i class="el-icon-data-line"></i>
           </div>
-        </el-card>
+          <div class="kpi-text">
+            <p class="kpi-label">实时市值 (Market Cap)</p>
+            <vue-count-to :start-val="0" :end-val="metricsData.marketCap" :duration="2000" :decimals="2" class="kpi-value" prefix="$"></vue-count-to>
+          </div>
+        </div>
       </el-col>
-      
-      <!-- 右侧：最近交易记录 -->
-      <el-col :span="12">
-         <el-card class="box-card list-card">
-           <template #header>
-            <div class="card-header">最近交易记录</div>
-          </template>
-          <el-table :data="recentTransactions" stripe style="width: 100%" height="300">
-            <el-table-column label="类型" width="100">
-              <template #default="{ row }">
-                <el-tag :type="getTransactionTypeTag(row.type)" size="small">{{ getTransactionTypeLabel(row.type) }}</el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column label="金额" prop="amount" align="right">
-                 <template #default="{ row }">
-                   {{ formatCurrency(row.amount) }}
-                 </template>
-            </el-table-column>
-            <el-table-column label="状态" width="100" align="center">
-                 <template #default="{ row }">
-                   <el-tag :type="row.status === 'confirmed' ? 'success' : 'warning'" size="small">{{ getTransactionStatusLabel(row.status) }}</el-tag>
-                 </template>
-            </el-table-column>
-            <el-table-column label="时间" prop="timestamp" width="160">
-                <template #default="{ row }">
-                   {{ formatDate(row.timestamp) }}
-                 </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
+      <!-- ... 其他三个KPI卡片也做类似修改 ... -->
+      <el-col :xs="24" :sm="12" :lg="6">
+        <div class="kpi-card">
+           <div class="kpi-icon-wrapper" style="--icon-bg: #f6ffed; --icon-color: #52c41a;">
+            <i class="el-icon-coin"></i>
+          </div>
+          <div class="kpi-text">
+            <p class="kpi-label">流通供应量</p>
+            <vue-count-to :start-val="0" :end-val="metricsData.circulatingSupply" :duration="2000" :decimals="2" class="kpi-value"></vue-count-to>
+          </div>
+        </div>
+      </el-col>
+       <el-col :xs="24" :sm="12" :lg="6">
+        <div class="kpi-card">
+           <div class="kpi-icon-wrapper" style="--icon-bg: #fffbe6; --icon-color: #faad14;">
+            <i class="el-icon-sort"></i>
+          </div>
+          <div class="kpi-text">
+            <p class="kpi-label">24小时交易量</p>
+            <vue-count-to :start-val="0" :end-val="metricsData.volume24h" :duration="2000" :decimals="2" class="kpi-value" prefix="$"></vue-count-to>
+          </div>
+        </div>
+      </el-col>
+       <el-col :xs="24" :sm="12" :lg="6">
+        <div class="kpi-card">
+           <div class="kpi-icon-wrapper" style="--icon-bg: #fff1f0; --icon-color: #f5222d;">
+            <i class="el-icon-user"></i>
+          </div>
+          <div class="kpi-text">
+            <p class="kpi-label">24小时活跃地址</p>
+            <vue-count-to :start-val="0" :end-val="metricsData.activeAddresses24h" :duration="2000" class="kpi-value"></vue-count-to>
+          </div>
+        </div>
       </el-col>
     </el-row>
 
+    <!-- 4. 主内容区 - 经典的两栏布局 -->
+    <el-row :gutter="24">
+
+<!-- 左侧主栏 (占据2/3空间) -->
+<el-col :xs="24" :lg="16">
+  <!-- 历史趋势图 - 作为视觉焦点 -->
+  <div class="content-card focus-card">
+    <div class="card-header">
+      <h3><i class="el-icon-data-line"></i> 市值历史趋势 (30天)</h3>
+      <el-tag effect="dark" size="small">Real-time</el-tag>
+    </div>
+    <div ref="historyChartRef" class="chart-container" v-loading="loading"></div>
+  </div>
+</el-col>
+
+<!-- 右侧副栏 (占据1/3空间) -->
+<el-col :xs="24" :lg="8">
+  <div class="sidebar-stack">
+    <!-- 交易量分布图 -->
+    <div class="content-card sidebar-card">
+      <div class="card-header">
+        <h3><i class="el-icon-pie-chart"></i> 交易量来源</h3>
+      </div>
+      <div ref="barChartRef" class="chart-container" v-loading="loading"></div>
+    </div>
+    
+    <!-- 最近交易记录 -->
+    <div class="content-card sidebar-card">
+      <div class="card-header">
+        <h3><i class="el-icon-document"></i> 最近交易</h3>
+      </div>
+      <div class="transaction-feed">
+        <el-table :data="metricsData.realTimeTransactions" style="width: 100%" height="250px" class="compact-table">
+          
+          <!-- 第一列：交易哈希 (带截断和复制功能) -->
+          <el-table-column label="交易哈希 (Tx Hash)" min-width="150">
+            <template #default="{ row }">
+              <div class="tx-hash-cell" :title="row.hash">
+                <span>{{ truncateAddress(row.hash) }}</span>
+                <i class="el-icon-copy-document copy-icon" @click="copyToClipboard(row.hash)"></i>
+              </div>
+            </template>
+          </el-table-column>
+
+          <!-- 第二列：交易金额 -->
+          <el-table-column label="金额 (Amount)" align="right">
+            <template #default="{ row }">
+              <div class="tx-amount-cell" :class="{ 'large-tx': row.amount > 100000 }">
+                {{ formatCurrency(row.amount) }}
+              </div>
+            </template>
+          </el-table-column>
+
+          <!-- 第三列：交易时间 (显示为“多久以前”) -->
+          <el-table-column label="时间 (Time)" align="right" width="120">
+            <template #default="{ row }">
+                <span class="tx-time-cell">{{ formatTimeAgo(row.timestamp) }}</span>
+            </template>
+          </el-table-column>
+
+        </el-table>
+        <el-empty v-if="!metricsData.realTimeTransactions || metricsData.realTimeTransactions.length === 0" description="暂无交易"></el-empty>
+      </div>
+    </div>
+  </div>
+</el-col>
+
+</el-row>
   </div>
 </template>
-
 
 <script>
 import { ElCard, ElRow, ElCol, ElTable, ElTableColumn, ElTag } from 'element-plus'
@@ -129,7 +136,7 @@ import request from '@/api/index'
 import { reserveAPI } from '@/api/reserve'
 import * as echarts from 'echarts'
 import AnimatedNumber from '../components/AnimatedNumber.vue'
-
+import { CountTo } from 'vue-count-to'; // <-- 引入新组件
 export default {
   name: 'Dashboard',
   components: {
@@ -139,7 +146,8 @@ export default {
     ElTable,
     ElTableColumn,
     ElTag,
-    AnimatedNumber
+    // AnimatedNumber,
+    'vue-count-to': CountTo,
   },
   data() {
     return {
@@ -207,7 +215,8 @@ export default {
     initCharts() {
       this.historyChart = echarts.init(this.$refs.historyChartRef)
       this.barChart = echarts.init(this.$refs.barChartRef)
-
+      // 为浅色主题配置更协调的颜色
+      const colors = ['#5470C6', '#91CC75', '#FAC858', '#EE6666', '#73C0DE'];
       this.historyChart.setOption({
         tooltip: { trigger: 'axis' },
         xAxis: { type: 'category', boundaryGap: false },
@@ -221,7 +230,8 @@ export default {
         xAxis: { type: 'value', boundaryGap: [0, 0.01] },
         yAxis: { type: 'category', data: [] },
         grid: { left: '25%', right: '10%', top: '5%', bottom: '5%' },
-        series: [{ type: 'bar', data: [] }]
+        series: [{ type: 'bar', data: [] }],
+        color: colors
       })
     },
     updateCharts() {
@@ -301,137 +311,243 @@ export default {
 </script>
 
 <style scoped>
-/* ----- 主题和布局 ----- */
-.dashboard-container {
-  padding: 24px;
-  background-color: #f7f8fa;
-  min-height: 100vh;
+/* ----- 1. 根容器和主题 ----- */
+.light-tech-dashboard {
+  background-color: #f9fafb;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.box-card {
-  border: 1px solid #e4e7ed;
-  border-radius: 12px;
-  background-color: #ffffff;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.card-header {
-  font-size: 18px;
-  font-weight: 600;
-  color: #303133;
-}
-
-/* ----- 欢迎区 ----- */
-.welcome-card {
-  margin-bottom: 24px;
-}
-.welcome-content {
+/* ----- 2. 页面头部 ----- */
+.page-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  margin-bottom: 24px;
 }
-.welcome-avatar {
-  margin-right: 20px;
-  background-color: #409EFF; /* 主题色 */
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
 }
-.welcome-text {
-  line-height: 1.4;
-}
-.welcome-title {
-  font-size: 22px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-}
-.welcome-subtitle {
+.page-subtitle {
   font-size: 14px;
-  color: #909399;
-  margin: 0;
+  color: #6b7280;
+  margin-top: 8px;
+}
+/* ... (header-right 等样式保持不变) ... */
+
+/* ----- 3. 栅格行间距 ----- */
+.el-row {
+  margin-bottom: 24px;
+}
+.el-row:last-child {
+  margin-bottom: 0;
 }
 
-/* ----- KPI 卡片 ----- */
-.kpi-row {
-  margin-bottom: 0; /* 因为 box-card 已经有 margin-bottom */
-}
+
+/* ----- 4. KPI 卡片 ----- */
 .kpi-card {
   background-color: #fff;
-  padding: 24px;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
-  border: 1px solid #e4e7ed;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  padding: 24px;
+  display: flex;
+  align-items: center;
   transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 .kpi-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+.kpi-icon-wrapper {
+  font-size: 28px;
+  padding: 16px;
+  border-radius: 50%;
+  margin-right: 20px;
+  background-color: var(--icon-bg);
+  color: var(--icon-color);
+}
+.kpi-text {
+  line-height: 1.4;
 }
 .kpi-label {
-  margin: 0 0 10px 0;
-  color: #606266;
-  font-size: 15px;
+  margin: 0 0 8px 0;
+  color: #6b7280;
+  font-size: 14px;
 }
 .kpi-value {
   margin: 0;
-  font-size: 32px;
-  font-weight: bold;
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  font-family: 'Roboto Mono', monospace;
 }
 
-/* ----- 图表卡片 ----- */
-.chart-card {
-  height: 400px;
+/* ----- 5. 主内容卡片 (替换 box-card) ----- */
+.content-card {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
 }
-::v-deep .el-card__body {
-  flex-grow: 1;
-  padding: 10px;
+.card-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
 }
+.chart-card, .list-card {
+  height: 420px; /* 统一高度 */
+}
+/* 通用内容卡片样式 */
+.content-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  padding: 24px;
+  margin-bottom: 24px; /* 统一的下外边距 */
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+.content-card:hover {
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.07);
+  transform: translateY(-4px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+.card-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+}
+.card-header h3 i {
+  margin-right: 8px;
+  color: #409EFF; /* 主题色 */
+  font-size: 18px;
+}
+
+/* 主图表卡片样式 */
+.focus-card {
+  height: 624px; /* 占据更大高度 */
+}
+
+/* 右侧边栏布局 */
+.sidebar-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* 使用 gap 创建间隙 */
+}
+.sidebar-card {
+  flex-grow: 1; /* 让两个卡片平分空间 */
+  margin-bottom: 0; /* 因为 gap 已经处理了间距 */
+  min-height: 300px;
+}
+
+
+/* 图表容器 */
+.chart-container {
+  width: 100%;
+  flex-grow: 1;
+}
+
+/* ----- 5. 紧凑型表格美化 ----- */
+.compact-table {
+  flex-grow: 1;
+}
+/* 移除 el-table 默认的 padding 和 border */
+::v-deep .el-table .el-card__body {
+    padding: 0 !important;
+}
+::v-deep .compact-table {
+    border: none;
+}
+/* 透明化表头 */
+::v-deep .compact-table th {
+  background-color: transparent !important;
+  padding: 8px 0 !important;
+}
+::v-deep .compact-table th > .cell {
+  font-weight: 500;
+  font-size: 12px;
+  color: #9ca3af;
+  text-transform: none;
+}
+/* 单元格样式 */
+::v-deep .compact-table td {
+    padding: 10px 0 !important;
+    border-bottom: 1px solid #f3f4f6;
+}
+::v-deep .compact-table tr:last-child td {
+    border-bottom: none;
+}
+::v-deep .compact-table tr:hover > td {
+    background-color: #f9fafb !important;
+}
+/* 自定义单元格内容 */
+.tx-type-cell {
+  display: flex;
+  align-items: center;
+}
+.status-dot {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  flex-shrink: 0; /* 防止被挤压 */
+}
+.status-success { background-color: #10b981; }
+.status-pending { background-color: #f59e0b; }
+.tx-amount-cell {
+  font-weight: 600;
+  font-family: 'Roboto Mono', monospace;
+}
+
+
+/* 深度修改 el-card 样式 */
+::v-deep .el-card__header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #f3f4f6;
+}
+::v-deep .el-card__body {
+  flex-grow: 1; /* 让内容区占满剩余空间 */
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ----- 6. 图表和列表容器 ----- */
 .chart-container {
   width: 100%;
   height: 100%;
+  flex-grow: 1;
 }
 
-/* ----- 列表卡片 ----- */
-.list-card {
-    height: 380px; /* 统一列表卡片高度 */
-    display: flex;
-    flex-direction: column;
+/* 表格样式 */
+::v-deep .el-table {
+    border-top: 1px solid #ebeef5;
 }
-/* 实时交易Feed */
-.transaction-feed {
-    height: 100%;
-    overflow-y: auto;
-}
-.transaction-feed ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.tx-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 5px;
-  border-bottom: 1px solid #f0f2f5;
-  font-size: 14px;
-}
-.tx-time { width: 80px; color: #909399; }
-.tx-info { flex-grow: 1; }
-.tx-address {
-  font-family: monospace;
-  background-color: #f4f4f5;
-  padding: 2px 4px;
-  border-radius: 4px;
-}
-.tx-amount { font-weight: 600; width: 150px; text-align: right; }
-
-/* 列表动画 */
-.list-enter-active, .list-leave-active { transition: all 0.5s ease; }
-.list-enter-from, .list-leave-to { opacity: 0; transform: translateY(-20px); }
-
-/* 最近交易表格 */
 ::v-deep .el-table th > .cell {
   font-weight: 600;
-  color: #555;
-  background-color: #fafbfe;
+  color: #6b7280;
+  font-size: 12px;
+  text-transform: uppercase;
 }
-
+::v-deep .el-table tr:hover > td {
+    background-color: #f9fafb;
+}
 </style>

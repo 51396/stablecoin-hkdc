@@ -8,12 +8,17 @@ import Transactions from '../views/Transactions.vue'
 import Whitelist from '../views/Whitelist.vue'
 import Dashboard from '../views/Dashboard.vue'
 
+// 引入布局组件
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
+import FullWidthLayout from '@/layouts/FullWidthLayout.vue';
+
 const IssuerConsole = () => import('../views/IssuerConsole.vue')
 const AdminConsole = () => import('../views/Admin.vue')
 const ContractConfig = () => import('../views/ContractConfig.vue')
 const AddressManagement = () => import('../views/AddressManagement.vue')
 const ReserveManagement = () => import('../views/ReserveManagement.vue')
 const ReserveAdmin = () => import('../views/ReserveAdmin.vue')
+const ReserveCenter = () => import('../views/ReserveCenter.vue')
 const ProofOfReserve = () => import('../views/ProofOfReserve.vue')
 
 const routes = [
@@ -24,13 +29,14 @@ const routes = [
   { path: '/trade', component: Trade },
   { path: '/transactions', component: Transactions },
   { path: '/whitelist', component: Whitelist },
-  { path: '/dashboard', component: Dashboard },
+  { path: '/dashboard', component: FullWidthLayout, children:[{path:"",name: 'Dashboard',component: Dashboard}] },
   { path: '/issuer', component: IssuerConsole },
   { path: '/admin', component: AdminConsole },
   { path: '/contract-config', component: ContractConfig },
   { path: '/address-management', component: AddressManagement },
   { path: '/reserve-management', component: ReserveManagement },
   { path: '/reserve-admin', component: ReserveAdmin },
+  { path: '/reserve-center', component: ReserveCenter },
   { path: '/proof-of-reserve', component: ProofOfReserve },
 ]
 

@@ -3,16 +3,16 @@ from datetime import datetime
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
+from typing import Optional
 # 模拟外部API或服务
 from ..services.price_fetcher import get_real_time_prices
 from ..services.balance_fetcher import get_real_time_balances
 
 # 数据库和模型依赖
 from ..database import get_db
-from ..models import ReserveAssetDB
+from ..models.custodian import ReserveAssetAccountDB
 from ..schemas.reserve import ReserveData, ReserveAsset,ReserveAssetCreate,AssetTransactionCreate,ReserveAssetInfo,ReserveAssetUpdate
-
+from ..schemas.custodian import PaginatedAccounts,ReserveAssetAccountDetails,ReserveAssetAccount,ReserveAssetAccountCreate
 # 1. 创建一个新的路由组
 router = APIRouter(
     prefix="/reserves",
@@ -31,38 +31,28 @@ def get_reserve_data_endpoint(db: Session = Depends(get_db)):
     try:
 
         # 1. 从数据库获取所有配置好的储备资产
-        db_assets = db.query(ReserveAssetDB).all()
+        db_assets = db.query(ReserveAssetAccountDB).all()
         if not db_assets:
             # 如果数据库中没有任何资产配置，返回一个空的默认结构
             return ReserveData(
                 totalReserve=0, circulatingSupply=0,collateralRatio=0,assetTypes=0, 
                 lastUpdated=datetime.utcnow(), assets=[]
             )
-
-        # 2. 从外部服务获取所有资产的实时价格和余额
-        #    在真实应用中，这会是复杂的API调用
-        tickers = [asset.ticker for asset in db_assets]
-        real_time_prices = get_real_time_prices(tickers)
-        real_time_balances = get_real_time_balances([asset.id for asset in db_assets])
+        print(db_assets)
         # 3. 计算每个资产的价值和总价值
         processed_assets = []
         total_reserve_usd = 0
 
         for asset in db_assets:
-            # 获取实时数据，如果获取失败，可以使用默认值或跳过
-            price = real_time_prices.get(asset.ticker, 0)
-            balance = asset.base_balance
-            print(price,balance)
-            value_usd = balance * price
-            total_reserve_usd += value_usd
 
             processed_assets.append({
                 "id": asset.id,
                 "name": asset.name,
                 "asset_type": asset.asset_type,
-                "balance": balance,
-                "value_usd": value_usd
+                "balance": asset.balance,
+                "value_usd": asset.balance
             })
+            total_reserve_usd = total_reserve_usd + asset.balance
         
         # 4. 计算每个资产的占比
         final_assets = []
@@ -210,3 +200,62 @@ def get_core_metrics_endpoint():
         volumeDistribution=core_metrics.get_volume_distribution(),
         realTimeTransactions=core_metrics.get_real_time_transactions()
     )
+    
+from ..models.custodian import create_asset_account,get_accounts
+    
+@router.post("/account", 
+             response_model=ReserveAssetAccount,
+             summary="创建一个新的资产账户")
+def create_account_endpoint(
+    account_data: ReserveAssetAccountCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    在指定的托管机构下，创建一个新的资产账户记录。
+    """
+    try:
+        return create_asset_account(db=db, account=account_data)
+    except ValueError as e:
+        # 捕获我们在CRUD层抛出的验证错误 (机构不存在、名称重复等)
+        raise HTTPException(status_code=400, detail=str(e))
+    
+@router.get("/accounts", 
+            response_model=PaginatedAccounts, # 使用新的分页响应模型
+            summary="获取资产账户列表 (分页/筛选)")
+def get_accounts_endpoint(
+    db: Session = Depends(get_db),
+    skip: int = 0,
+    limit: int = 10,
+    custodian_id: Optional[int] = None,
+    asset_type: Optional[str] = None,
+    search: Optional[str] = None
+):
+    """
+    获取资产账户列表，支持通过托管机构、资产类型和名称进行筛选。
+    """
+    
+    accounts, total = get_accounts(
+        db=db, 
+        skip=skip, 
+        limit=limit, 
+        custodian_id=custodian_id, 
+        asset_type=asset_type, 
+        search=search
+    )
+    return {"total": total, "items": accounts}
+
+
+@router.get("/account/{account_id}",
+            response_model=ReserveAssetAccountDetails,
+            summary="获取单个资产账户的详情")
+def get_account_details_endpoint(
+    account_id: int,
+    db: Session = Depends(get_db)
+):
+    """
+    获取指定ID的资产账户的详细信息，包括其所有的余额变动历史。
+    """
+    db_account = get_account_details(db=db, account_id=account_id)
+    if not db_account:
+        raise HTTPException(status_code=404, detail="资产账户未找到")
+    return db_account

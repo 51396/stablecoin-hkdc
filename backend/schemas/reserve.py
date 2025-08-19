@@ -9,7 +9,7 @@ from ..models.base import Base
 from enum import Enum
 from datetime import datetime
 from typing import Optional
-
+from .custodian import Custodian
 
 # --- 新增模型：资产交易/变动记录 ---
 class TransactionTypeEnum(str, Enum):
@@ -17,9 +17,9 @@ class TransactionTypeEnum(str, Enum):
     WITHDRAW = "取出"
 
 class AssetTypeEnum(str, Enum):
-    fiat = "法币"
-    crypto = "加密货币"
-    commodity = "大宗商品"
+    cash = "现金"
+    casheq = "现金等价物"
+    bondshort = "短期政府债券"
 
 
 class ReserveAssetBase(BaseModel):

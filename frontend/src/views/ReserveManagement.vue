@@ -11,7 +11,8 @@
     <el-card class="card">
       <div class="card-title">储备金管理</div>
       <p>在这里可以管理储备金资产。</p>
-      <el-button type="primary" @click="$router.push('/reserve-admin')">储备金管理</el-button>
+      <el-button type="primary" @click="$router.push('/reserve-center')">储备金管理</el-button>
+      <!-- <el-button type="primary" @click="$router.push('/reserve-admin')">储备金管理</el-button> -->
     </el-card>
     <!-- 顶部关键指标 (KPI) 卡片 -->
     <el-row :gutter="24" class="kpi-row">

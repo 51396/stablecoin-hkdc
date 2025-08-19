@@ -110,3 +110,6 @@ def update_reserve_asset(db: Session, asset_id: int, asset_update: ReserveAssetU
     db.commit()
     db.refresh(db_asset)
     return db_asset
+
+
+

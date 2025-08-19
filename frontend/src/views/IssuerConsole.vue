@@ -19,18 +19,6 @@
       >
         销毁
       </el-button>
-      <el-button 
-        :type="activeTab === 'whitelist' ? 'primary' : 'default'" 
-        @click="activeTab = 'whitelist'"
-      >
-        白名单
-      </el-button>
-      <el-button 
-        :type="activeTab === 'deposit' ? 'primary' : 'default'" 
-        @click="activeTab = 'deposit'"
-      >
-        法币充值
-      </el-button>
     </div>
 
     <el-card class="card">
