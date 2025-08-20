@@ -40,6 +40,10 @@
           <el-icon><Coin /></el-icon>
           <span>稳定币管理</span>
         </el-menu-item>
+        <el-menu-item index="/account-management">
+          <el-icon><List /></el-icon>
+          <span>账户管理</span>
+        </el-menu-item>
         <el-menu-item index="/address-management">
           <el-icon><List /></el-icon>
           <span>地址管理</span>

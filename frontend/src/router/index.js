@@ -12,9 +12,12 @@ import Dashboard from '../views/Dashboard.vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import FullWidthLayout from '@/layouts/FullWidthLayout.vue';
 
+
 const IssuerConsole = () => import('../views/IssuerConsole.vue')
+const StablecoinIssuance = () => import("../views/StablecoinIssuance.vue")
 const AdminConsole = () => import('../views/Admin.vue')
 const ContractConfig = () => import('../views/ContractConfig.vue')
+const AccountManagement = () => import('../views/AccountManagement.vue')
 const AddressManagement = () => import('../views/AddressManagement.vue')
 const ReserveManagement = () => import('../views/ReserveManagement.vue')
 const ReserveAdmin = () => import('../views/ReserveAdmin.vue')
@@ -30,9 +33,10 @@ const routes = [
   { path: '/transactions', component: Transactions },
   { path: '/whitelist', component: Whitelist },
   { path: '/dashboard', component: FullWidthLayout, children:[{path:"",name: 'Dashboard',component: Dashboard}] },
-  { path: '/issuer', component: IssuerConsole },
+  { path: '/issuer', component: StablecoinIssuance },
   { path: '/admin', component: AdminConsole },
   { path: '/contract-config', component: ContractConfig },
+  { path: '/account-management', component: AccountManagement },
   { path: '/address-management', component: AddressManagement },
   { path: '/reserve-management', component: ReserveManagement },
   { path: '/reserve-admin', component: ReserveAdmin },

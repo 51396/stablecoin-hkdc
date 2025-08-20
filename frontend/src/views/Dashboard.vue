@@ -11,15 +11,16 @@
     </div>
 
     <!-- 3. 顶部KPI卡片区 - 使用el-row -->
-    <el-row :gutter="24">
-      <el-col :xs="24" :sm="12" :lg="6">
+    <el-row :gutter="32">
+      <el-col :xs="32" :sm="12" :lg="6">
         <div class="kpi-card">
           <div class="kpi-icon-wrapper" style="--icon-bg: #e6f7ff; --icon-color: #1890ff;">
             <i class="el-icon-data-line"></i>
           </div>
           <div class="kpi-text">
             <p class="kpi-label">实时市值 (Market Cap)</p>
-            <vue-count-to :start-val="0" :end-val="metricsData.marketCap" :duration="2000" :decimals="2" class="kpi-value" prefix="$"></vue-count-to>
+            <span class="kpi-value">$ {{ formatLargeNumber(metricsData.marketCap) }}</span>
+            <!-- <vue-count-to :start-val="0" :end-val="metricsData.marketCap" :duration="2000" :decimals="2" class="kpi-value" ></vue-count-to> -->
           </div>
         </div>
       </el-col>
@@ -31,7 +32,8 @@
           </div>
           <div class="kpi-text">
             <p class="kpi-label">流通供应量</p>
-            <vue-count-to :start-val="0" :end-val="metricsData.circulatingSupply" :duration="2000" :decimals="2" class="kpi-value"></vue-count-to>
+            <span class="kpi-value">$ {{ formatLargeNumber(metricsData.circulatingSupply) }}</span>
+            <!-- <vue-count-to :start-val="0" :end-val="metricsData.circulatingSupply" :duration="2000" :decimals="2" class="kpi-value"></vue-count-to> -->
           </div>
         </div>
       </el-col>
@@ -42,7 +44,8 @@
           </div>
           <div class="kpi-text">
             <p class="kpi-label">24小时交易量</p>
-            <vue-count-to :start-val="0" :end-val="metricsData.volume24h" :duration="2000" :decimals="2" class="kpi-value" prefix="$"></vue-count-to>
+            <span class="kpi-value">$ {{ formatLargeNumber(metricsData.volume24h) }}</span>
+            <!-- <vue-count-to :start-val="0" :end-val="metricsData.volume24h" :duration="2000" :decimals="2" class="kpi-value" prefix="$"></vue-count-to> -->
           </div>
         </div>
       </el-col>
@@ -53,7 +56,8 @@
           </div>
           <div class="kpi-text">
             <p class="kpi-label">24小时活跃地址</p>
-            <vue-count-to :start-val="0" :end-val="metricsData.activeAddresses24h" :duration="2000" class="kpi-value"></vue-count-to>
+            <span class="kpi-value">{{ formatLargeNumber(metricsData.activeAddresses24h) }}</span>
+            <!-- <vue-count-to :start-val="0" :end-val="metricsData.activeAddresses24h" :duration="2000" class="kpi-value"></vue-count-to> -->
           </div>
         </div>
       </el-col>
@@ -305,6 +309,39 @@ export default {
     },
     truncateAddress(addr) {
       return addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : ''
+    },
+        /**
+     * 将大数字格式化为带单位的缩写 (K, M, B)
+     * @param {number} num - 需要格式化的数字
+     * @param {number} digits - 保留的小数位数
+     * @returns {string} - 例如: 1.23M
+     */
+     formatLargeNumber(num, digits = 2) {
+      if (typeof num !== 'number' || num === 0) return '0';
+      
+      const si = [
+        { value: 1, symbol: "" },
+        { value: 1E3, symbol: "K" }, // 千
+        { value: 1E6, symbol: "M" }, // 百万
+        { value: 1E9, symbol: "B" }, // 十亿
+        { value: 1E12, symbol: "T" }  // 万亿
+      ];
+      
+      // 创建一个正则表达式来移除尾随的.00或.0
+      const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+      
+      // 找到合适的单位
+      let i;
+      for (i = si.length - 1; i > 0; i--) {
+        if (num >= si[i].value) {
+          break;
+        }
+      }
+      
+      // 格式化数字并替换尾随的零
+      const formattedNum = (num / si[i].value).toFixed(digits).replace(rx, "$1");
+      
+      return formattedNum + si[i].symbol;
     }
   }
 }
