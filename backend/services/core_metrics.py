@@ -19,6 +19,8 @@ def _generate_fake_hash() -> str:
     return hashlib.sha256(random_data).hexdigest()
 
 def get_current_metrics():
+    
+    
     """模拟从实时数据源获取当前核心指标"""
     base_supply = 100_000_000
     return {

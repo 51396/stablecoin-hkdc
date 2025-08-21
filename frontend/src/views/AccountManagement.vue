@@ -32,7 +32,7 @@
                       <div class="expanded-content">
                         <div class="expanded-header">
                            <h4><i class="el-icon-wallet"></i> 绑定的地址 ({{ row.addresses.length }})</h4>
-                           <el-button type="primary" text size="small" @click="openAddressDialog(row)">绑定新地址</el-button>
+                           <el-button type="primary" size="small" @click="openAddressDialog(row)">绑定新地址</el-button>
                         </div>
                         <el-table :data="row.addresses" size="small" stripe>
                           <el-table-column prop="label" label="地址标签"></el-table-column>
@@ -49,7 +49,7 @@
                           </el-table-column>
                           <el-table-column label="操作" align="center">
                             <template #default="props">
-                              <el-button type="danger" text size="small" @click="handleUnbindAddress(row, props.row)">解绑</el-button>
+                              <el-button type="danger" size="small" @click="handleUnbindAddress(row, props.row)">解绑</el-button>
                             </template>
                           </el-table-column>
                         </el-table>
@@ -66,7 +66,7 @@
                   </el-table-column>
                   <el-table-column label="操作" align="center" width="150">
                     <template #default="{ row }">
-                      <el-button type="primary" text size="small" @click="openInstitutionalAccountDialog(row)">编辑</el-button>
+                      <el-button type="primary" size="small" @click="openInstitutionalAccountDialog(row)">编辑</el-button>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -153,8 +153,8 @@
   // Options API
   import { Search, CopyDocument, Right } from '@element-plus/icons-vue';
   // Mock API (模拟后端)
-import {retailAccountAPI} from '@/api/account';
-  
+import {retailAccountAPI} from '@/api/retail_account';
+import {institutionalAccountAPI} from '@/api/institutional_account'
   export default {
     name: 'AccountManagement',
     components: { Search, CopyDocument, Right },
@@ -193,7 +193,10 @@ import {retailAccountAPI} from '@/api/account';
     mounted() { this.fetchInstitutionalAccounts(); },
     methods: {
       // --- 对公方法 ---
-      async fetchInstitutionalAccounts() { /* ... */ },
+      async fetchInstitutionalAccounts() { 
+        const response = await institutionalAccountAPI.getInstitutionalAccounts();
+        this.institutionalAccounts = response.data.items;
+       },
       openInstitutionalAccountDialog(account = null) {
         if (account) {
           this.isEditingInstitutionalAccount = true;
@@ -205,19 +208,20 @@ import {retailAccountAPI} from '@/api/account';
       },
       resetInstitutionalAccountForm() { this.$refs.institutionalAccountFormRef.resetFields(); },
       async saveInstitutionalAccount() {
+        console.log(1)
         this.$refs.institutionalAccountFormRef.validate(async (valid) => {
           if (!valid) return;
           this.institutionalAccountFormLoading = true;
           try {
             if (this.isEditingInstitutionalAccount) {
-              await mockAPI.updateInstitutionalAccount(this.institutionalAccountForm.id, this.institutionalAccountForm);
+              await institutionalAccountAPI.updateInstitutionalAccount(this.institutionalAccountForm.id, this.institutionalAccountForm);
             } else {
-              await mockAPI.createInstitutionalAccount(this.institutionalAccountForm);
+              await institutionalAccountAPI.createInstitutionalAccount(this.institutionalAccountForm);
             }
             this.$message.success('操作成功！');
             this.institutionalAccountDialogVisible = false;
             await this.fetchInstitutionalAccounts();
-          } catch (error) { this.$message.error('操作失败'); }
+          } catch (error) { this.$message.error('操作失败',error); }
           finally { this.institutionalAccountFormLoading = false; }
         });
       },
@@ -231,8 +235,8 @@ import {retailAccountAPI} from '@/api/account';
           if (!valid) return;
           this.addressFormLoading = true;
           try {
-            const payload = { ...this.addressForm, account_id: this.currentInstitutionalAccount.id };
-            await mockAPI.bindAddress(payload);
+            const payload = { ...this.addressForm };
+            await institutionalAccountAPI.bindAddress(this.currentInstitutionalAccount.id,payload);
             this.$message.success('地址绑定成功！');
             this.addressDialogVisible = false;
             await this.fetchInstitutionalAccounts();

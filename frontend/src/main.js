@@ -9,6 +9,7 @@ import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import './assets/styles.css'
 
+import AppTable from './components/AppTable.vue'
 const app = createApp(App)
 
 // 应用初始化时检查用户登录状态
@@ -44,6 +45,7 @@ initApp()
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
+app.component('app-table',AppTable)
 
 app
   .use(router)

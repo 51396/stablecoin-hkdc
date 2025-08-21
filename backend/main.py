@@ -1,7 +1,8 @@
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from .database import init_db, get_db
-from .routers import user, wallet, trade, whitelist, mint, burn, transaction, contract, dashboard, issuer, total_supply, address, reserve, custodian,retail_accounts
+from .routers import user, wallet, trade, whitelist, mint, burn, transaction, contract, dashboard, issuer\
+     , total_supply, address, reserve, custodian,retail_accounts,institutional_accounts,issuance
 from .services.transaction_service import sync_contract_transactions
 from .services.total_supply_service import update_total_supply_periodically
 import asyncio
@@ -34,6 +35,8 @@ app.include_router(address.router)
 app.include_router(reserve.router)
 app.include_router(custodian.router)
 app.include_router(retail_accounts.router)
+app.include_router(institutional_accounts.router)
+app.include_router(issuance.router)
 # 存储后台任务的引用
 background_task = None
 background_task_total_supply = None
